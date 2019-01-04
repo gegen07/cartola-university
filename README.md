@@ -61,7 +61,7 @@ It will be the master admin that verify the teams admin and so on!
 
 ## Positions
 - Goalkeeper
-- Midfielder
+- Defender
 - Attacker
 
 ## Status
