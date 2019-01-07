@@ -1,0 +1,23 @@
+version: '3'
+services:
+  redis: 
+    image: redis:alpine
+    ports: 
+      - "6379"
+  postgres:
+    image: postgres:11
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_DB: cartola
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      PGDATA: /var/lib/postgresql/data/pgdata
+  # cartola-coltec-service
+  # cartola-coltec-query
+  # elasticseacrh
+  # nginx
+  # logstash
+volumes:
+  pgdata:
