@@ -25,7 +25,7 @@ services:
   
   cartola-coltec-service:
     build:
-      context: ./dockerfiles/go-service
+      context: ./app/cartola-coltec-service
       dockerfile: Dockerfile
     volumes:
       - ./app/cartola-coltec-service:/go/src/github.com/gegen07/cartola-coltec/app/cartola-coltec-service
