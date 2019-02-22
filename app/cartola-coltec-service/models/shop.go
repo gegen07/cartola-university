@@ -6,7 +6,7 @@ import (
 
 // Shop struct represent the stats of shop
 type Shop struct {
-	CurrentRound 		int
+	CurrentRound 		Round
 	Status		 		string
 	Players      		[]Player
 	Year         		int

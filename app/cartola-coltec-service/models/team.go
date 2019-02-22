@@ -7,5 +7,5 @@ type Team struct {
 	Nickname    string
 	ImageShield string
 	Players     []Player
-	Stats		[]Stats
+	Stats		*TeamStats
 }
