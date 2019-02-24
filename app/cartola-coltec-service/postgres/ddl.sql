@@ -84,20 +84,27 @@ CREATE TABLE round_matches (
 
 DROP TABLE IF EXISTS cup CASCADE;
 CREATE TABLE cup (
-    id  SERIAL PRIMARY KEY,
+    id                 SERIAL PRIMARY KEY,
     id_winner_team     INT REFERENCES team(id) ON DELETE CASCADE,
     id_second_team     INT REFERENCES team(id) ON DELETE CASCADE,
     id_third_team      INT REFERENCES team(id) ON DELETE CASCADE,
+    id_current_round   INT REFERENCES round(id) ON DELETE CASCADE,
     year               INT NOT NULL,
     begin_date         TIMESTAMP NOT NULL,
     finish_date        TIMESTAMP NOT NULL,
     name_cup           VARCHAR(255) NOT NULL
 );
 
+DROP TABLE IF EXISTS cup_rounds CASCADE;
+CREATE TABLE cup_rounds (
+    id          SERIAL PRIMARY KEY;
+    id_cup      INT REFERENCES cup(id) ON DELETE CASCADE;
+    id_round    INT REFERENCES round(id) ON DELETE CASCADE;
+);
+
 DROP TABLE IF EXISTS shop CASCADE;
 CREATE TABLE shop (
     id          SERIAL PRIMARY KEY,
-    id_round    INT REFERENCES round(id) ON DELETE CASCADE,
     id_cup      INT REFERENCES cup(id) ON DELETE CASCADE,
     status      VARCHAR(255) NOT NULL
 );
