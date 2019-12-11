@@ -1,4 +1,4 @@
-package repository
+package round
 
 import (
 	"context"
@@ -7,14 +7,13 @@ import (
 	"fmt"
 
 	"github.com/gegen07/cartola-coltec/app/cartola-coltec-service/models"
-	"github.com/gegen07/cartola-coltec/app/cartola-coltec-service/round"
 )
 
 type pgsqlRoundRepository struct {
 	Db *sql.DB
 }
 
-func NewPgsqlRoundRepository(Db *sql.DB) round.Repository {
+func NewPgsqlRoundRepository(Db *sql.DB) Repository {
 	return &pgsqlRoundRepository{Db}
 }
 

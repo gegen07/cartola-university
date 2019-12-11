@@ -12,10 +12,10 @@ type Player struct {
 	Photo            string
 	Price            decimal.Decimal
 	Score            decimal.Decimal
-	Median			 decimal.Decimal
+	Median			 		 decimal.Decimal
 	NumMatches       int
-	ScoutStats		 []PlayerStats
+	ScoutStats		   []PlayerStats
 	Team             Team
-	Position 		 Position 
-	Status 			 Status		
+	Position 		     Position 
+	Status 			     Status		
 }

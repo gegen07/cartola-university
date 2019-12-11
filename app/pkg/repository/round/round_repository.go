@@ -2,7 +2,7 @@ package round
 
 import (
 	"context"
-	"github.com/gegen07/cartola-coltec/app/cartola-coltec-service/models"
+	"github.com/gegen07/cartola-coltec/app/pkg/models"
 )
 
 // Repository represent the round's repository contract
