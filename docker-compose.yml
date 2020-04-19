@@ -1,12 +1,12 @@
 version: '3'
 
 services:
-  redis: 
-    image: redis:alpine
-    ports: 
-      - 6379:6379
-    networks:
-      - backend
+#  redis:
+#    image: redis:alpine
+#    ports:
+#      - 6379:6379
+#    networks:
+#      - backend
   
   postgres:
     image: postgres:11
@@ -22,35 +22,35 @@ services:
     networks:
       - backend
   
-  cartola-coltec-service:
-    build:
-      context: ./app/cartola-coltec-service
-      dockerfile: Dockerfile
-    volumes:
-      - ./app/cartola-coltec-service:/go/src/github.com/gegen07/cartola-coltec/app/cartola-coltec-service
-    ports:
-      - "8080"
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - backend
-      - frontend
+#  cartola-coltec-service:
+#    build:
+#      context: ./src/services/cartola-service
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ./:/go/src/github.com/gegen07/cartola-university
+#    ports:
+#      - "8080"
+#    depends_on:
+#      - redis
+#      - postgres
+#    networks:
+#      - backend
+#      - frontend
     
   # cartola-coltec-query
   # elasticseacrh
   # logstash
 
-  nginx:
-    build:
-      context: ./dockerfiles/nginx
-      dockerfile: Dockerfile
-    ports:
-      - 8080:8000
-    depends_on:
-      - cartola-coltec-service
-    networks:
-      - frontend
+#  nginx:
+#    build:
+#      context: ./dockerfiles/nginx
+#      dockerfile: Dockerfile
+#    ports:
+#      - 8080:8000
+#    depends_on:
+#      - cartola-coltec-service
+#    networks:
+#      - frontend
   
 volumes:
   pgdata:

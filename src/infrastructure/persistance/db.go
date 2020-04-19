@@ -5,6 +5,8 @@ import (
 	"github.com/gegen07/cartola-university/domain/entity"
 	"github.com/gegen07/cartola-university/domain/repository"
 	"github.com/jinzhu/gorm"
+
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type Repositories struct {
@@ -13,7 +15,7 @@ type Repositories struct {
 }
 
 func NewRepositories(DbDriver, DbUser, DbPass, DbPort, DbHost, DbName string) (*Repositories, error) {
-	url := fmt.Sprintf("host:%s port:%s user:%s dbname:%s password:%s", DbHost, DbPort, DbUser, DbName, DbPass)
+	url := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPass)
 	db, err := gorm.Open(DbDriver, url)
 
 	if err != nil {
@@ -32,7 +34,7 @@ func (s *Repositories) Close() error {
 	return s.db.Close()
 }
 
-func (s *Repositories) migrate() error {
+func (s *Repositories) Migrate() error {
 	return s.db.AutoMigrate(
 		&entity.Formation{},
 		).Error

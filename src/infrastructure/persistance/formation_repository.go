@@ -60,8 +60,8 @@ func (r FormationRepository) Update(formation *entity.Formation) (*entity.Format
 	return formation, nil
 }
 
-func (r FormationRepository) Delete(formation *entity.Formation) error {
-	err := r.db.Debug().Delete(&formation).Error
+func (r FormationRepository) Delete(id uint64) error {
+	err := r.db.Debug().Where("id = ?", id).Delete(&entity.Formation{}).Error
 
 	if err != nil {
 		return err

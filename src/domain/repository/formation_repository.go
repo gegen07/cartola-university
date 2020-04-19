@@ -10,5 +10,5 @@ type FormationRepository interface {
 	GetByID(id uint64) (*entity.Formation, error)
 	Insert(formation *entity.Formation) (*entity.Formation, error)
 	Update(formation *entity.Formation) (*entity.Formation, error)
-	Delete(formation *entity.Formation) error
+	Delete(id uint64) error
 }

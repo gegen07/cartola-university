@@ -1,13 +1,11 @@
 package entity
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
 // Formation is the schema of game team
 type Formation struct {
-	gorm.Model
 	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Goalkeeper uint64 `gorm:"not null" json:"goalkeeper"`
 	Attackers  uint64 `gorm:"not null" json:"attackers"`
@@ -17,7 +15,6 @@ type Formation struct {
 }
 
 type PublicFormation struct {
-	gorm.Model
 	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Goalkeeper uint64 `gorm:"not null" json:"goalkeeper"`
 	Attackers  uint64 `gorm:"not null" json:"attackers"`

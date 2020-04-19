@@ -16,7 +16,7 @@ type FormationApplicationInterface interface {
 	GetByID(id uint64) (*entity.Formation, error)
 	Insert(formation *entity.Formation) (*entity.Formation, error)
 	Update(formation *entity.Formation) (*entity.Formation, error)
-	Delete(formation *entity.Formation) error
+	Delete(formationId uint64) error
 }
 
 func (f formationApplication) GetAll(args ...interface{}) ([]entity.Formation, error) {
@@ -35,6 +35,6 @@ func (f formationApplication) Update(formation *entity.Formation) (*entity.Forma
 	return f.repo.Update(formation)
 }
 
-func (f formationApplication) Delete(formation *entity.Formation) error {
-	return f.repo.Delete(formation)
+func (f formationApplication) Delete(formationId uint64) error {
+	return f.repo.Delete(formationId)
 }
