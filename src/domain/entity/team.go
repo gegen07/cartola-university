@@ -1,4 +1,4 @@
-package models
+package entity
 
 // Team is a team which is playing the cup
 type Team struct {
@@ -7,5 +7,5 @@ type Team struct {
 	Nickname    string
 	ImageShield string
 	Players     []Player
-	Stats		*TeamStats
+	Stats       *TeamStats
 }

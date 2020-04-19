@@ -1,7 +1,7 @@
-package models
+package entity
 
 // Position struct represents the position of the player in a team
 type Position struct {
-	ID int
+	ID          int
 	Description string
 }
