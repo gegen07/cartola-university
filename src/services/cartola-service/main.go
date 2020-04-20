@@ -38,11 +38,11 @@ func main() {
 	router := mux.NewRouter()
 
 	//formation routes
-	router.HandleFunc("/formation", formations.Insert).Methods("POST")
-	router.HandleFunc("/formation", formations.GetAllFormations).Methods("GET")
-	router.HandleFunc("/formation/{id}", formations.GetFormationById).Methods("GET")
-	router.HandleFunc("/formation/{id}", formations.Update).Methods("PUT")
-	router.HandleFunc("/formation/{id}", formations.Delete).Methods("DELETE")
+	router.Handle("/formation", interfaces.RootHandler(formations.Insert)).Methods("POST")
+	router.Handle("/formation", interfaces.RootHandler(formations.GetAllFormations)).Methods("GET")
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.GetFormationById)).Methods("GET")
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Update)).Methods("PUT")
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Delete)).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS()(router)))
 }

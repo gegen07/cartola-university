@@ -2,10 +2,11 @@ package interfaces
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gegen07/cartola-university/application"
 	"github.com/gegen07/cartola-university/domain/entity"
+	"github.com/gegen07/cartola-university/interfaces/errors"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -20,22 +21,26 @@ func NewFormationHandler(formationApp application.FormationApplicationInterface)
 	}
 }
 
-func (handler *FormationHandler) GetAllFormations (w http.ResponseWriter, r *http.Request) {
+func (handler *FormationHandler) GetAllFormations(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodGet {
+		return errors.NewHTTPError(nil, 405, "Method Not Allowed")
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 
 	formations, err := handler.formationApplication.GetAll()
 
 	if err != nil {
-		log.Printf(err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return fmt.Errorf("DB error: %v", err)
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(formations)
+
+	return nil
 }
 
-func (handler *FormationHandler) GetFormationById (w http.ResponseWriter, r *http.Request) {
+func (handler *FormationHandler) GetFormationById(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
@@ -43,41 +48,45 @@ func (handler *FormationHandler) GetFormationById (w http.ResponseWriter, r *htt
 	formationId, err := strconv.ParseUint(params["id"], 10, 64)
 
 	if err != nil {
-		log.Printf(err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return errors.NewHTTPError(err, 400, "Invalid JSON")
 	}
 
 	formation, err := handler.formationApplication.GetByID(formationId)
 
 	if err != nil {
-		log.Printf(err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return fmt.Errorf("DB error: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(formation.PublicFormation())
+
+	return nil
 }
 
-func (handler *FormationHandler) Insert(w http.ResponseWriter, r *http.Request) {
+func (handler *FormationHandler) Insert(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	var formation entity.Formation
-	_ = json.NewDecoder(r.Body).Decode(&formation)
+
+	err := json.NewDecoder(r.Body).Decode(&formation)
+
+	if err != nil {
+		return errors.NewHTTPError(err, 400, "Invalid JSON")
+	}
 
 	f, err := handler.formationApplication.Insert(&formation)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return fmt.Errorf("DB error: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(f.PublicFormation())
+
+	return nil
 }
 
-func (handler *FormationHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *FormationHandler) Update(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	var formation entity.Formation
@@ -87,24 +96,28 @@ func (handler *FormationHandler) Update(w http.ResponseWriter, r *http.Request) 
 	formation.ID, err = strconv.ParseUint(params["id"], 10, 64)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return errors.NewHTTPError(err, 400, "Invalid JSON")
 	}
 
-	_ = json.NewDecoder(r.Body).Decode(&formation)
+	err = json.NewDecoder(r.Body).Decode(&formation)
+
+	if err != nil {
+		return errors.NewHTTPError(err, 400, "Invalid JSON")
+	}
 
 	f, err := handler.formationApplication.Update(&formation)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return fmt.Errorf("DB error: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(f.PublicFormation())
+
+	return nil
 }
 
-func (handler *FormationHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *FormationHandler) Delete(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
@@ -112,16 +125,16 @@ func (handler *FormationHandler) Delete(w http.ResponseWriter, r *http.Request) 
 	formationId, err := strconv.ParseUint(params["id"], 10, 64)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return errors.NewHTTPError(err, 400, "Invalid JSON")
 	}
 
 	err = handler.formationApplication.Delete(formationId)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return fmt.Errorf("DB error: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
+
+	return nil
 }

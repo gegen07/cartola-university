@@ -14,7 +14,7 @@ func NewFormationRepository(db *gorm.DB) *FormationRepository {
 	return &FormationRepository{db: db}
 }
 
-var _ repository.FormationRepository= &FormationRepository{}
+var _ repository.FormationRepository = &FormationRepository{}
 
 func (r FormationRepository) GetAll(args ...interface{}) ([]entity.Formation, error) {
 	var formations []entity.Formation
