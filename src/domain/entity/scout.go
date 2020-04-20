@@ -1,8 +1,43 @@
 package entity
 
+import "time"
+
 // Scout struct represents the stats of each player
 type Scout struct {
-	ID          int
-	Description string
-	Points      int
+	ID          int `gorm:"primary_key;auto_increment" json:"id"`
+	Description string `gorm:"not null" json:"description"`
+	Points      int `gorm:"not null" json:"points"`
+	CreatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+}
+
+type PublicScout struct {
+	ID          int `gorm:"primary_key;auto_increment" json:"id"`
+	Description string `gorm:"not null" json:"description"`
+	Points      int `gorm:"not null" json:"points"`
+}
+
+type Scouts []Scout
+
+func (scouts Scouts) PublicScouts() []interface{} {
+	result := make([]interface{}, len(scouts))
+
+	for i, scout := range scouts {
+		result[i] = scout
+	}
+
+	return result
+}
+
+func (s *Scout) PublicScout() *PublicScout {
+	return &PublicScout{
+		ID:          s.ID,
+		Description: s.Description,
+		Points:      s.Points,
+	}
+}
+
+func (s *Scout) Prepare() {
+	s.CreatedAt = time.Now()
+	s.UpdatedAt = time.Now()
 }
