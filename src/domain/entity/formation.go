@@ -9,7 +9,7 @@ type Formation struct {
 	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Goalkeeper uint64 `gorm:"not null" json:"goalkeeper"`
 	Attackers  uint64 `gorm:"not null" json:"attackers"`
-	Defenders  uint64 `gorm:"not null" json: "defenders"`
+	Defenders  uint64 `gorm:"not null" json:"defenders"`
 	CreatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -18,7 +18,7 @@ type PublicFormation struct {
 	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Goalkeeper uint64 `gorm:"not null" json:"goalkeeper"`
 	Attackers  uint64 `gorm:"not null" json:"attackers"`
-	Defenders  uint64 `gorm:"not null" json: "defenders"`
+	Defenders  uint64 `gorm:"not null" json:"defenders"`
 }
 
 type Formations []Formation
