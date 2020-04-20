@@ -15,7 +15,7 @@ type Player struct {
 	Median     decimal.Decimal
 	NumMatches int
 	ScoutStats []PlayerStats
-	Team       Team
+	TeamRefer  uint
 	Position   Position
 	Status     Status
 }

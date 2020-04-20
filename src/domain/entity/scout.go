@@ -1,20 +1,23 @@
 package entity
 
-import "time"
+import (
+	"github.com/shopspring/decimal"
+	"time"
+)
 
 // Scout struct represents the stats of each player
 type Scout struct {
-	ID          int `gorm:"primary_key;auto_increment" json:"id"`
+	ID          uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
-	Points      int `gorm:"not null" json:"points"`
+	Points      decimal.Decimal `gorm:"not null" json:"points"`
 	CreatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 type PublicScout struct {
-	ID          int `gorm:"primary_key;auto_increment" json:"id"`
+	ID          uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
-	Points      int `gorm:"not null" json:"points"`
+	Points      decimal.Decimal `gorm:"not null" json:"points"`
 }
 
 type Scouts []Scout
