@@ -15,10 +15,10 @@ type Formation struct {
 }
 
 type PublicFormation struct {
-	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
-	Goalkeeper uint64 `gorm:"not null" json:"goalkeeper"`
-	Attackers  uint64 `gorm:"not null" json:"attackers"`
-	Defenders  uint64 `gorm:"not null" json:"defenders"`
+	ID         uint64 `json:"id"`
+	Goalkeeper uint64 `json:"goalkeeper"`
+	Attackers  uint64 `json:"attackers"`
+	Defenders  uint64 `json:"defenders"`
 }
 
 type Formations []Formation

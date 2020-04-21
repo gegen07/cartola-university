@@ -1,4 +1,4 @@
-package entity
+package tournament
 
 import (
 	"time"
@@ -6,8 +6,8 @@ import (
 
 // Round struct represents the matches of the week
 type Round struct {
-	ID              int
-	Matches         []Match `gorm:"foreignkey:RoundReference"`
+	ID              uint64
+	TournamentID	uint64 `gorm:"foreign_key:tournament_id" json:"tournament_id"`
 	RoundBeginDate  time.Time
 	RoundFinishDate time.Time
 }

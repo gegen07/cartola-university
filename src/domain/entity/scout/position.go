@@ -1,4 +1,4 @@
-package entity
+package scout
 
 import "time"
 
@@ -6,6 +6,7 @@ import "time"
 type Position struct {
 	ID          int `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
+	Scouts 		[]Scout `gorm:"foreignkey:position_id" json:"scouts"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -13,6 +14,7 @@ type Position struct {
 type PublicPosition struct {
 	ID          int `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
+	Scouts 		[]Scout `gorm:"foreignkey:position_id" json:"scouts"`
 }
 
 type Positions []Position
