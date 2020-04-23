@@ -4,7 +4,7 @@ import "time"
 
 // Position struct represents the position of the player in a team
 type Position struct {
-	ID          int `gorm:"primary_key;auto_increment" json:"id"`
+	ID          int `gorm:"primary_key;auto_increment; column:id" json:"id"`
 	Description string `gorm:"not null" json:"description"`
 	Scouts 		[]Scout `gorm:"foreignkey:position_id" json:"scouts"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
