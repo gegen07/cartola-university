@@ -19,26 +19,27 @@ type PublicScout struct {
 	ID          uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
 	Points      decimal.Decimal `gorm:"not null" json:"points"`
-	PositionId	uint64 `gorm:"column:position_id" json:"position_id"`
+	Position   	Position `json:"position"`
 }
 
 type Scouts []Scout
 
-func (scouts Scouts) PublicScouts() []interface{} {
+func (scouts Scouts) PublicScouts(dict map[uint64]Position) []interface{} {
 	result := make([]interface{}, len(scouts))
 
 	for i, scout := range scouts {
-		result[i] = scout
+		result[i] = scout.PublicScout(dict[scout.PositionId])
 	}
 
 	return result
 }
 
-func (s *Scout) PublicScout() *PublicScout {
+func (s *Scout) PublicScout(position Position) *PublicScout {
 	return &PublicScout{
 		ID:          s.ID,
 		Description: s.Description,
 		Points:      s.Points,
+		Position: 	 position,
 	}
 }
 
