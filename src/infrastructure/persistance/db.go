@@ -13,6 +13,7 @@ import (
 type Repositories struct {
 	Formation repository.FormationRepository
 	Scout repository.ScoutRepository
+	Position repository.PositionRepository
 	db *gorm.DB
 }
 
@@ -29,6 +30,7 @@ func NewRepositories(DbDriver, DbUser, DbPass, DbPort, DbHost, DbName string) (*
 	return &Repositories{
 		Formation: NewFormationRepository(db),
 		Scout: NewScoutRepository(db),
+		Position: NewPositionRepository(db),
 		db: db,
 	}, nil
 }
@@ -41,5 +43,6 @@ func (s *Repositories) Migrate() error {
 	return s.db.AutoMigrate(
 		&entity.Formation{},
 		&scout.Scout{},
+		&scout.Position{},
 		).Error
 }

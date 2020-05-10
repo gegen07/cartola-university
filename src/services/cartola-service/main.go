@@ -33,8 +33,9 @@ func main() {
 
 	_ = services.Migrate()
 
+	position := interfaces.NewPositionHandler(services.Position)
 	formations := interfaces.NewFormationHandler(services.Formation)
-	scouts := interfaces.NewScoutHandler(services.Scout)
+	scouts := interfaces.NewScoutHandler(services.Scout, services.Position)
 
 	router := mux.NewRouter()
 
@@ -51,6 +52,13 @@ func main() {
 	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.GetScoutByID)).Methods(http.MethodGet)
 	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.Update)).Methods(http.MethodPut)
 	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.Delete)).Methods(http.MethodDelete)
+
+	//position routes
+	router.Handle("/position", interfaces.RootHandler(position.Insert)).Methods(http.MethodPost)
+	router.Handle("/position", interfaces.RootHandler(position.GetAll)).Methods(http.MethodGet)
+	router.Handle("/position/{id}", interfaces.RootHandler(position.GetByID)).Methods(http.MethodGet)
+	router.Handle("/position/{id}", interfaces.RootHandler(position.Update)).Methods(http.MethodPut)
+	router.Handle("/position/{id}", interfaces.RootHandler(position.Delete)).Methods(http.MethodDelete)
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS()(router)))
 }

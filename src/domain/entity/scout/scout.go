@@ -18,7 +18,7 @@ type PublicScout struct {
 	ID          uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
 	Points      float64 `gorm:"not null" json:"points"`
-	PositionId	uint64 `gorm:"column:position_id" json:"position_id"`
+	PositionID	uint64 `gorm:"column:position_id" json:"position_id"`
 }
 
 type Scouts []Scout
@@ -38,7 +38,7 @@ func (s *Scout) PublicScout() *PublicScout {
 		ID:          s.ID,
 		Description: s.Description,
 		Points:      s.Points,
-		PositionId:  s.PositionId,
+		PositionID:  s.PositionId,
 	}
 }
 
