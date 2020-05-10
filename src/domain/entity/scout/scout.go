@@ -1,7 +1,6 @@
 package scout
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -10,7 +9,7 @@ type Scout struct {
 	ID           	uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	PositionId		uint64 `gorm:"column:position_id" json:"position_id"`
 	Description  	string `gorm:"not null" json:"description"`
-	Points       	decimal.Decimal `gorm:"not null" json:"points"`
+	Points       	float64 `gorm:"not null" json:"points"`
 	CreatedAt    	time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt 		time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
@@ -18,7 +17,7 @@ type Scout struct {
 type PublicScout struct {
 	ID          uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	Description string `gorm:"not null" json:"description"`
-	Points      decimal.Decimal `gorm:"not null" json:"points"`
+	Points      float64 `gorm:"not null" json:"points"`
 	PositionId	uint64 `gorm:"column:position_id" json:"position_id"`
 }
 

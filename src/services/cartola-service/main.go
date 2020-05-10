@@ -34,15 +34,23 @@ func main() {
 	_ = services.Migrate()
 
 	formations := interfaces.NewFormationHandler(services.Formation)
+	scouts := interfaces.NewScoutHandler(services.Scout)
 
 	router := mux.NewRouter()
 
 	//formation routes
-	router.Handle("/formation", interfaces.RootHandler(formations.Insert)).Methods("POST")
-	router.Handle("/formation", interfaces.RootHandler(formations.GetAllFormations)).Methods("GET")
-	router.Handle("/formation/{id}", interfaces.RootHandler(formations.GetFormationById)).Methods("GET")
-	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Update)).Methods("PUT")
-	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Delete)).Methods("DELETE")
+	router.Handle("/formation", interfaces.RootHandler(formations.Insert)).Methods(http.MethodPost)
+	router.Handle("/formation", interfaces.RootHandler(formations.GetAllFormations)).Methods(http.MethodGet)
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.GetFormationById)).Methods(http.MethodGet)
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Update)).Methods(http.MethodPut)
+	router.Handle("/formation/{id}", interfaces.RootHandler(formations.Delete)).Methods(http.MethodDelete)
+
+	//scout routes
+	router.Handle("/scout", interfaces.RootHandler(scouts.Insert)).Methods(http.MethodPost)
+	router.Handle("/scout", interfaces.RootHandler(scouts.GetAllScouts)).Methods(http.MethodGet)
+	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.GetScoutByID)).Methods(http.MethodGet)
+	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.Update)).Methods(http.MethodPut)
+	router.Handle("/scout/{id}", interfaces.RootHandler(scouts.Delete)).Methods(http.MethodDelete)
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS()(router)))
 }

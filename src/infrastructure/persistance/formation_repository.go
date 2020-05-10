@@ -31,7 +31,7 @@ func (r FormationRepository) GetAll(args ...interface{}) ([]entity.Formation, er
 func (r FormationRepository) GetByID(id uint64) (*entity.Formation, error) {
 	var formation entity.Formation
 
-	err := r.db.Debug().Where("id = ?").Take(&formation).Error
+	err := r.db.Debug().Where("id = ?", id).Take(&formation).Error
 
 	if err != nil {
 		return nil, err

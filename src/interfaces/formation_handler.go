@@ -23,19 +23,20 @@ func NewFormationHandler(formationApp application.FormationApplicationInterface)
 
 func (handler *FormationHandler) GetAllFormations(w http.ResponseWriter, r *http.Request) error {
 	if r.Method != http.MethodGet {
-		return errors.NewHTTPError(nil, 405, "Method Not Allowed")
+		return errors.NewHTTPError(nil, http.StatusMethodNotAllowed, "Method Not Allowed")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
+	var formations entity.Formations
 	formations, err := handler.formationApplication.GetAll()
 
 	if err != nil {
 		return fmt.Errorf("DB error: %v", err)
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(formations)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(formations.PublicFormations())
 
 	return nil
 }
@@ -80,7 +81,7 @@ func (handler *FormationHandler) Insert(w http.ResponseWriter, r *http.Request) 
 		return fmt.Errorf("DB error: %v", err)
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(f.PublicFormation())
 
 	return nil

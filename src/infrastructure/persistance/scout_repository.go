@@ -33,7 +33,7 @@ func (s ScoutRepository) GetAll(args ...interface{}) ([]scout.Scout, error) {
 func (s ScoutRepository) GetByID(id uint64) (*scout.Scout, error) {
 	var scout scout.Scout
 
-	err := s.db.Debug().Where("id = ?").Take(&scout).Error
+	err := s.db.Debug().Where("id = ?", id).Take(&scout).Error
 
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (s ScoutRepository) Update(scout *scout.Scout) (*scout.Scout, error) {
 }
 
 func (s ScoutRepository) Delete(id uint64) error {
-	err := s.db.Debug().Where("id = ?").Delete(&scout.Scout{}).Error
+	err := s.db.Debug().Where("id = ?", id).Delete(&scout.Scout{}).Error
 
 	if err != nil {
 		return err

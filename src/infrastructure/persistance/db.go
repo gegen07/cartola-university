@@ -3,6 +3,7 @@ package persistence
 import (
 	"fmt"
 	"github.com/gegen07/cartola-university/domain/entity"
+	"github.com/gegen07/cartola-university/domain/entity/scout"
 	"github.com/gegen07/cartola-university/domain/repository"
 	"github.com/jinzhu/gorm"
 
@@ -11,6 +12,7 @@ import (
 
 type Repositories struct {
 	Formation repository.FormationRepository
+	Scout repository.ScoutRepository
 	db *gorm.DB
 }
 
@@ -26,6 +28,7 @@ func NewRepositories(DbDriver, DbUser, DbPass, DbPort, DbHost, DbName string) (*
 
 	return &Repositories{
 		Formation: NewFormationRepository(db),
+		Scout: NewScoutRepository(db),
 		db: db,
 	}, nil
 }
@@ -37,5 +40,6 @@ func (s *Repositories) Close() error {
 func (s *Repositories) Migrate() error {
 	return s.db.AutoMigrate(
 		&entity.Formation{},
+		&scout.Scout{},
 		).Error
 }
