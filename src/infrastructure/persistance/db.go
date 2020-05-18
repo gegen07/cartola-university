@@ -11,6 +11,7 @@ type Repositories struct {
 	Formation repository.FormationRepository
 	Scout repository.ScoutRepository
 	Position repository.PositionRepository
+	ScoutPosition repository.ScoutPositionRepository
 	db *sql.DB
 }
 
@@ -26,6 +27,7 @@ func NewRepositories(DbDriver, DbUser, DbPass, DbPort, DbHost, DbName string) (*
 		Formation: NewFormationRepository(db),
 		Scout: NewScoutRepository(db),
 		Position: NewPositionRepository(db),
+		ScoutPosition: NewScoutPositionRepository(db),
 		db: db,
 	}, nil
 }
