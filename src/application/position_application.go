@@ -90,9 +90,35 @@ func (p *PositionApplication) GetById(ctx context.Context,id uint64) (*scout.Pos
 	return position, nil
 }
 
-func (p *PositionApplication) Insert(ctx context.Context, position *scout.Position) (*scout.Position, error) {
+func (p *PositionApplication) Insert(c context.Context, position *scout.Position) (*scout.Position, error) {
+	g, ctx := errgroup.WithContext(c)
+
 	ctx, cancel := context.WithTimeout(ctx, p.contextTimeout)
 	defer cancel()
+
+	g.Go(func() error {
+		for _, scout := range position.Scouts {
+			err := p.scoutPositionRepository.AddRelation(c, scout.ID, position.ID)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	go func() {
+		err := g.Wait()
+
+		if err != nil {
+			return
+		}
+	}()
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
 
 	return p.repo.Insert(ctx, position)
 }
@@ -104,9 +130,41 @@ func (p *PositionApplication) Update(ctx context.Context, position *scout.Positi
 	return p.repo.Update(ctx, position)
 }
 
-func (p *PositionApplication) Delete(ctx context.Context, id uint64) error {
+func (p *PositionApplication) Delete(c context.Context, id uint64) error {
+	g, ctx := errgroup.WithContext(c)
+
 	ctx, cancel := context.WithTimeout(ctx, p.contextTimeout)
 	defer cancel()
+
+	res, err := p.scoutPositionRepository.GetScoutsByPositionID(ctx, id)
+
+	if err != nil {
+		return err
+	}
+
+	g.Go(func() error {
+		for _, r := range res {
+			err := p.scoutPositionRepository.DeleteRelation(ctx, r.ID, id)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	go func() {
+		err := g.Wait()
+
+		if err != nil {
+			return
+		}
+	}()
+
+	if err := g.Wait(); err!= nil {
+		return err
+	}
 
 	return p.repo.Delete(ctx, id)
 }

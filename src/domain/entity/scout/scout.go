@@ -6,18 +6,21 @@ import (
 
 // Scout struct represents the stats of each player
 type Scout struct {
-	ID           	uint64 `json:"id"`
-	Description  	string `json:"description"`
-	Points       	float64 `json:"points"`
-	CreatedAt    	time.Time  `json:"created_at"`
-	UpdatedAt 		time.Time  `json:"updated_at"`
+	ID           	uint64
+	Description  	string
+	Scout 			string
+	Points       	float64
+	Positions		[]Position
+	CreatedAt    	time.Time
+	UpdatedAt 		time.Time
 }
 
 type PublicScout struct {
 	ID          uint64 `json:"id"`
 	Description string `json:"description"`
+	Scout 		string `json:"scout"`
 	Points      float64 `json:"points"`
-	PositionID	uint64 `json:"position_id"`
+	Positions   []Position `json:"positions"`
 }
 
 type Scouts []Scout
@@ -37,6 +40,8 @@ func (s *Scout) PublicScout() *PublicScout {
 		ID:          s.ID,
 		Description: s.Description,
 		Points:      s.Points,
+		Scout: 		 s.Scout,
+		Positions:   s.Positions,
 	}
 }
 
