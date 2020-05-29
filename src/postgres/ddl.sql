@@ -14,6 +14,7 @@ CREATE TABLE scouts (
     id SERIAL PRIMARY KEY,
     scout varchar(255) NOT null,
     description text NOT null,
+    points decimal not null,
     created_at TIMESTAMPTZ(6) NOT null,
     updated_at timestamptz(6) NOT null
 );
@@ -26,8 +27,8 @@ CREATE TABLE positions (
     updated_at timestamptz(6) NOT null
 );
 
-drop table if exists scout_positions cascade; 
-create table scout_positions (
+drop table if exists scout_position cascade; 
+create table scout_position (
 	id serial primary key,
 	position_id integer references positions(id),
 	scout_id integer references scouts(id),
