@@ -29,7 +29,7 @@ func (s ScoutRepository) fetch(ctx context.Context, query string, args ...interf
 		return nil, err
 	}
 
-	rows, err := stmt.QueryContext(ctx, args)
+	rows, err := stmt.QueryContext(ctx, args...)
 
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (s ScoutRepository) fetch(ctx context.Context, query string, args ...interf
 func (s ScoutRepository) GetAll(ctx context.Context, page int) ([]scout.Scout, error) {
 	limit := 10
 	offset := (page-1)*limit
-	query := `SELECT id, scout, description, points, created_at, updated_at FROM scouts;`
+	query := `SELECT id, scout, description, points, created_at, updated_at FROM scouts`
 
 	scouts, err := s.fetch(ctx, query, limit, offset)
 
@@ -72,7 +72,7 @@ func (s ScoutRepository) GetAll(ctx context.Context, page int) ([]scout.Scout, e
 }
 
 func (s ScoutRepository) GetByID(ctx context.Context, id uint64) (*scout.Scout, error) {
-	query := `SELECT id, scout, description, points, created_at, updated_at FROM scouts WHERE id=?;`
+	query := `SELECT id, scout, description, points, created_at, updated_at FROM scouts WHERE id=$1`
 
 	scouts, err := s.fetch(ctx, query, id)
 
@@ -89,14 +89,19 @@ func (s ScoutRepository) GetByID(ctx context.Context, id uint64) (*scout.Scout, 
 
 func (s ScoutRepository) Insert(ctx context.Context, scout *scout.Scout) (*scout.Scout, error) {
 	query := `INSERT INTO scouts (scout, description, points, created_at, updated_at) 
-				VALUES (scout=?, description=?, points=?, created_at=?, updated_at=?);`
+				VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = stmt.ExecContext(ctx, scout.Scout, scout.Description, scout.Points, scout.CreatedAt, scout.UpdatedAt)
+	err = stmt.QueryRowContext(ctx,
+				scout.Scout,
+				scout.Description,
+				scout.Points,
+				scout.CreatedAt,
+				scout.UpdatedAt).Scan(&scout.ID)
 
 	if err != nil {
 		return nil, err
@@ -106,7 +111,7 @@ func (s ScoutRepository) Insert(ctx context.Context, scout *scout.Scout) (*scout
 }
 
 func (s ScoutRepository) Update(ctx context.Context, scout *scout.Scout) (*scout.Scout, error) {
-	query := `UPDATE scouts SET (scout=?, description=?, points=?, updated_at=?);`
+	query := `UPDATE scouts SET (scout, description, points, updated_at) = ($1, $2, $3, $4) WHERE id=$5`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 
@@ -135,7 +140,7 @@ func (s ScoutRepository) Update(ctx context.Context, scout *scout.Scout) (*scout
 }
 
 func (s ScoutRepository) Delete(ctx context.Context, id uint64) error {
-	query := `DELETE FROM scouts WHERE id=?`
+	query := `DELETE FROM scouts WHERE id=$1`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 

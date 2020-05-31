@@ -29,7 +29,7 @@ func (p PositionRepository) fetch(ctx context.Context, query string, args ...int
 		return nil, err
 	}
 
-	rows, err := stmt.QueryContext(ctx, query, args)
+	rows, err := stmt.QueryContext(ctx, args...)
 	defer rows.Close()
 
 	if err != nil {
@@ -60,7 +60,7 @@ func (p PositionRepository) GetAll(ctx context.Context, page int) ([]scout.Posit
 	limit := 10
 	offset := (page-1) * limit
 
-	query := `SELECT p.id, p.description, p.created_at, p.updated_at FROM positions p LIMIT ? OFFSET ?;`
+	query := `SELECT p.id, p.description, p.created_at, p.updated_at FROM positions p LIMIT $1 OFFSET $2`
 
 	positions, err := p.fetch(ctx, query, limit, offset)
 
@@ -72,7 +72,7 @@ func (p PositionRepository) GetAll(ctx context.Context, page int) ([]scout.Posit
 }
 
 func (p PositionRepository) GetById(ctx context.Context, id uint64) (*scout.Position, error) {
-	query := `SELECT id, description, created_at, updated_at FROM positions WHERE id = ?`
+	query := `SELECT id, description, created_at, updated_at FROM positions WHERE id = $1`
 
 	positions, err := p.fetch(ctx, query, id)
 	if err != nil {
@@ -88,7 +88,7 @@ func (p PositionRepository) GetById(ctx context.Context, id uint64) (*scout.Posi
 
 func (p PositionRepository) Insert(ctx context.Context, position *scout.Position) (*scout.Position, error) {
 	query := `INSERT INTO positions (description, created_at, updated_at) 
-				VALUES (description=?, created_at=?, updated_at=?);`
+				VALUES ($1, $2, $3) RETURNING id`
 
 	stmt, err := p.db.PrepareContext(ctx, query)
 
@@ -96,10 +96,10 @@ func (p PositionRepository) Insert(ctx context.Context, position *scout.Position
 		return nil, err
 	}
 
-	_, err = stmt.ExecContext(ctx,
+	err = stmt.QueryRowContext(ctx,
 		position.Description,
 		position.CreatedAt,
-		position.UpdatedAt)
+		position.UpdatedAt).Scan(&position.ID)
 
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (p PositionRepository) Insert(ctx context.Context, position *scout.Position
 }
 
 func (p PositionRepository) Update(ctx context.Context, position *scout.Position) (*scout.Position, error) {
-	query := `UPDATE positions SET (description=?, updated_at=?) WHERE id=?;`
+	query := `UPDATE positions SET (description, updated_at) = ($1, $2) WHERE id=$3`
 
 	stmt, err := p.db.PrepareContext(ctx, query)
 
@@ -136,7 +136,7 @@ func (p PositionRepository) Update(ctx context.Context, position *scout.Position
 }
 
 func (p PositionRepository) Delete(ctx context.Context, id uint64) error {
-	query := `DELETE FROM positions WHERE id=?;`
+	query := `DELETE FROM positions WHERE id=$1`
 
 	stmt, err := p.db.PrepareContext(ctx, query)
 

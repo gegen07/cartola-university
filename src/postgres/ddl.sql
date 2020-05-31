@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS formation cascade;
-CREATE TABLE formation (
+DROP TABLE IF EXISTS formations cascade;
+CREATE TABLE formations (
 	id          SERIAL PRIMARY KEY,
 	goalkeeper  SMALLINT NOT NULL,
 	defenders   SMALLINT NOT NULL,
@@ -35,5 +35,4 @@ create table scout_position (
 	created_at TIMESTAMPTZ(6) NOT null,
     updated_at timestamptz(6) NOT null
 );
-
 

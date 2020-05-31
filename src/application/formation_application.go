@@ -29,6 +29,7 @@ func (f formationApplication) GetByID(ctx context.Context, id uint64) (*entity.F
 }
 
 func (f formationApplication) Insert(ctx context.Context, formation *entity.Formation) (*entity.Formation, error) {
+	formation.Prepare()
 	return f.repo.Insert(ctx, formation)
 }
 

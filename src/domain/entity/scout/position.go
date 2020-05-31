@@ -11,6 +11,12 @@ type Position struct {
 	UpdatedAt time.Time
 }
 
+type RequestPosition struct {
+	ID         	uint64 `json:"id"`
+	Description string `json:"description"`
+	ScoutsID  	[]uint64 `json:"scouts_id"`
+}
+
 type PublicPosition struct {
 	ID          uint64 `json:"id"`
 	Description string `json:"description"`
@@ -34,6 +40,13 @@ func (p *Position) PublicPosition() *PublicPosition {
 		ID: p.ID,
 		Description: p.Description,
 		Scouts: p.Scouts,
+	}
+}
+
+func (p *RequestPosition) ToPosition() *Position {
+	return &Position{
+		ID:          p.ID,
+		Description: p.Description,
 	}
 }
 

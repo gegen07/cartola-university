@@ -17,19 +17,28 @@ type ScoutApplication struct {
 type ScoutApplicationInterface interface {
 	GetAll(ctx context.Context, page int) ([]scout.Scout, error)
 	GetByID(ctx context.Context, id uint64) (*scout.Scout, error)
-	Insert(ctx context.Context, scout *scout.Scout) (*scout.Scout, error)
+	Insert(ctx context.Context, scout *scout.RequestScout) (*scout.Scout, error)
 	Update(ctx context.Context, scout *scout.Scout) (*scout.Scout, error)
 	Delete(ctx context.Context, id uint64) error
 }
 
-var _ ScoutApplicationInterface = &ScoutApplication{}
 
-func (s *ScoutApplication) fillScoutWithPosition(c context.Context, data []scout.Scout) ([]scout.Scout, error) {
+func NewScoutApplication(repo repository.ScoutRepository,
+						scoutPositionRepo repository.ScoutPositionRepository,
+						timeout time.Duration) *ScoutApplication {
+	return &ScoutApplication{
+		repo:                    repo,
+		scoutPositionRepo:       scoutPositionRepo,
+		contextTimeout:          timeout,
+	}
+}
+
+func (sa *ScoutApplication) fillScoutWithPosition(c context.Context, data []scout.Scout) ([]scout.Scout, error) {
 	g, ctx := errgroup.WithContext(c)
 
 	for _, scout := range data  {
 		g.Go(func() error {
-			res, err := s.scoutPositionRepo.GetPositionsByScoutID(ctx, scout.ID)
+			res, err := sa.scoutPositionRepo.GetPositionsByScoutID(ctx, scout.ID)
 
 			if err != nil {
 				return err
@@ -56,30 +65,30 @@ func (s *ScoutApplication) fillScoutWithPosition(c context.Context, data []scout
 	return data, nil
 }
 
-func (s ScoutApplication) GetAll(ctx context.Context, page int) ([]scout.Scout, error) {
-	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+func (sa ScoutApplication) GetAll(ctx context.Context, page int) ([]scout.Scout, error) {
+	ctx, cancel := context.WithTimeout(ctx, sa.contextTimeout)
 	defer cancel()
 
-	scouts, err := s.repo.GetAll(ctx, page)
+	scouts, err := sa.repo.GetAll(ctx, page)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return s.fillScoutWithPosition(ctx, scouts)
+	return sa.fillScoutWithPosition(ctx, scouts)
 }
 
-func (s ScoutApplication) GetByID(ctx context.Context, id uint64) (*scout.Scout, error) {
-	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+func (sa ScoutApplication) GetByID(ctx context.Context, id uint64) (*scout.Scout, error) {
+	ctx, cancel := context.WithTimeout(ctx, sa.contextTimeout)
 	defer cancel()
 
-	scout, err := s.repo.GetByID(ctx, id)
+	scout, err := sa.repo.GetByID(ctx, id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	positions, err := s.scoutPositionRepo.GetPositionsByScoutID(ctx, scout.ID)
+	positions, err := sa.scoutPositionRepo.GetPositionsByScoutID(ctx, scout.ID)
 
 	if err != nil {
 		return nil, err
@@ -90,23 +99,32 @@ func (s ScoutApplication) GetByID(ctx context.Context, id uint64) (*scout.Scout,
 	return scout, nil
 }
 
-func (s ScoutApplication) Insert(c context.Context, scout *scout.Scout) (*scout.Scout, error) {
+func (sa ScoutApplication) Insert(c context.Context, reqScout *scout.RequestScout) (*scout.Scout, error) {
 	g, ctx := errgroup.WithContext(c)
 
-	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+	ctx, cancel := context.WithTimeout(ctx, sa.contextTimeout)
 	defer cancel()
 
-	g.Go(func() error {
-		for _, position := range scout.Positions {
-			err := s.scoutPositionRepo.AddRelation(c, scout.ID, position.ID)
+	var s *scout.Scout
+	s = reqScout.ToScout()
+	s.Prepare()
+	s, err := sa.repo.Insert(ctx, s)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, positionID := range reqScout.PositionsID {
+		g.Go(func() error {
+			err := sa.scoutPositionRepo.AddRelation(c, s.ID, positionID)
 
 			if err != nil {
 				return err
 			}
-		}
 
-		return nil
-	})
+			return nil
+		})
+	}
 
 	go func() {
 		err := g.Wait()
@@ -120,23 +138,23 @@ func (s ScoutApplication) Insert(c context.Context, scout *scout.Scout) (*scout.
 		return nil, err
 	}
 
-	return s.repo.Insert(ctx, scout)
+	return s, nil
 }
 
-func (s ScoutApplication) Update(ctx context.Context, scout *scout.Scout) (*scout.Scout, error) {
-	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+func (sa ScoutApplication) Update(ctx context.Context, scout *scout.Scout) (*scout.Scout, error) {
+	ctx, cancel := context.WithTimeout(ctx, sa.contextTimeout)
 	defer cancel()
 
-	return s.repo.Update(ctx, scout)
+	return sa.repo.Update(ctx, scout)
 }
 
-func (s ScoutApplication) Delete(ctx context.Context, id uint64) error {
+func (sa ScoutApplication) Delete(ctx context.Context, id uint64) error {
 	g, ctx := errgroup.WithContext(ctx)
 
-	ctx, cancel := context.WithTimeout(ctx, s.contextTimeout)
+	ctx, cancel := context.WithTimeout(ctx, sa.contextTimeout)
 	defer cancel()
 
-	res, err := s.scoutPositionRepo.GetPositionsByScoutID(ctx, id)
+	res, err := sa.scoutPositionRepo.GetPositionsByScoutID(ctx, id)
 
 	if err != nil {
 		return err
@@ -144,7 +162,7 @@ func (s ScoutApplication) Delete(ctx context.Context, id uint64) error {
 
 	g.Go(func() error {
 		for _, r := range res {
-			err := s.scoutPositionRepo.DeleteRelation(ctx, r.ID, id)
+			err := sa.scoutPositionRepo.DeleteRelation(ctx, r.ID, id)
 
 			if err != nil {
 				return err
@@ -166,5 +184,5 @@ func (s ScoutApplication) Delete(ctx context.Context, id uint64) error {
 		return err
 	}
 
-	return s.repo.Delete(ctx, id)
+	return sa.repo.Delete(ctx, id)
 }

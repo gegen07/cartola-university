@@ -15,6 +15,14 @@ type Scout struct {
 	UpdatedAt 		time.Time
 }
 
+type RequestScout struct {
+	ID           	uint64 `json:"id"`
+	Description  	string `json:"description"`
+	Scout 			string `json:"scout"`
+	Points       	float64 `json:"points"`
+	PositionsID		[]uint64 `json:"positions_id"`
+}
+
 type PublicScout struct {
 	ID          uint64 `json:"id"`
 	Description string `json:"description"`
@@ -42,6 +50,16 @@ func (s *Scout) PublicScout() *PublicScout {
 		Points:      s.Points,
 		Scout: 		 s.Scout,
 		Positions:   s.Positions,
+	}
+}
+
+func (s *RequestScout) ToScout() *Scout {
+	return &Scout{
+		ID:          s.ID,
+		Description: s.Description,
+		Scout:       s.Scout,
+		Points:      s.Points,
+		Positions:   nil,
 	}
 }
 

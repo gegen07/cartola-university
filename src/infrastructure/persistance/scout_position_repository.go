@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gegen07/cartola-university/domain/entity/scout"
 	"github.com/gegen07/cartola-university/domain/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type ScoutPositionRepository struct {
@@ -21,7 +22,7 @@ func NewScoutPositionRepository(db *sql.DB) *ScoutPositionRepository {
 }
 
 func (s ScoutPositionRepository) AddRelation(ctx context.Context, scoutId uint64, positionId uint64) error {
-	query := `INSERT INTO scout_position (position_id, scout_id) VALUES (position_id=?, scout_id=?);`
+	query := `INSERT INTO scout_position (position_id, scout_id) VALUES ($1, $2)`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 
@@ -29,7 +30,8 @@ func (s ScoutPositionRepository) AddRelation(ctx context.Context, scoutId uint64
 		return err
 	}
 
-	_, err = stmt.ExecContext(ctx, scoutId, positionId)
+	logrus.Info(positionId, scoutId)
+	_, err = stmt.ExecContext(ctx, positionId, scoutId)
 
 	if err != nil {
 		return err
@@ -40,7 +42,7 @@ func (s ScoutPositionRepository) AddRelation(ctx context.Context, scoutId uint64
 
 func (s ScoutPositionRepository) GetScoutsByPositionID(ctx context.Context, positionId uint64) ([]scout.Scout, error) {
 	query := `SELECT s.id, s.scout, s.description, s.points, s.created_at, s.updated_at 
-				FROM scout s INNER JOIN scout_position sp WHERE sp.position_id = ?;`
+				FROM scouts s INNER JOIN scout_position sp on sp.id = s.id WHERE (sp.position_id = $1)`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 
@@ -74,7 +76,7 @@ func (s ScoutPositionRepository) GetScoutsByPositionID(ctx context.Context, posi
 
 func (s ScoutPositionRepository) GetPositionsByScoutID(ctx context.Context, scoutId uint64) ([]scout.Position, error) {
 	query := `SELECT p.id, p.description, p.created_at, p.updated_at 
-				FROM positions p INNER JOIN scout_position sp WHERE sp.scout_id = ?`
+				FROM positions p INNER JOIN scout_position sp WHERE sp.scout_id = $1`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 
@@ -108,7 +110,7 @@ func (s ScoutPositionRepository) GetPositionsByScoutID(ctx context.Context, scou
 }
 
 func (s ScoutPositionRepository) DeleteRelation(ctx context.Context, position_id uint64, scout_id uint64) error {
-	query := `DELETE FROM scout_position sp WHERE sp.position_id=? AND sp.scout_id=?`
+	query := `DELETE FROM scout_position sp WHERE sp.position_id=$1 AND sp.scout_id=$2`
 
 	stmt, err := s.db.PrepareContext(ctx, query)
 

@@ -2,12 +2,11 @@ package persistence
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/gegen07/cartola-university/domain/entity"
 	"github.com/gegen07/cartola-university/domain/repository"
-
-	"database/sql"
-	)
+)
 
 type FormationRepository struct {
 	db *sql.DB
@@ -28,7 +27,7 @@ func (r FormationRepository) fetch(ctx context.Context, query string, args ...in
 		return nil, err
 	}
 
-	rows, err := stmt.QueryContext(ctx, args)
+	rows, err := stmt.QueryContext(ctx, args...)
 
 	defer rows.Close()
 
@@ -42,8 +41,8 @@ func (r FormationRepository) fetch(ctx context.Context, query string, args ...in
 		err = rows.Scan(
 				&f.ID,
 				&f.Goalkeeper,
-				&f.Attackers,
 				&f.Defenders,
+				&f.Attackers,
 				&f.CreatedAt,
 				&f.UpdatedAt,
 			)
@@ -62,7 +61,7 @@ func (r FormationRepository) GetAll(ctx context.Context, page int) ([]entity.For
 	limit := 10
 	offset := (page-1)*limit
 
-	query := `SELECT * from formations LIMIT ? OFFSET ?;`
+	query := `SELECT * from formations LIMIT $1 OFFSET $2`
 
 	formations, err := r.fetch(ctx, query, limit, offset)
 
@@ -74,7 +73,7 @@ func (r FormationRepository) GetAll(ctx context.Context, page int) ([]entity.For
 }
 
 func (r FormationRepository) GetByID(ctx context.Context, id uint64) (*entity.Formation, error) {
-	query := `SELECT * from formations WHERE id = ?;`
+	query := `SELECT * from formations WHERE id = $1`
 
 	formations, err := r.fetch(ctx, query, id)
 
@@ -90,21 +89,21 @@ func (r FormationRepository) GetByID(ctx context.Context, id uint64) (*entity.Fo
 }
 
 func (r FormationRepository) Insert(ctx context.Context, formation *entity.Formation) (*entity.Formation, error) {
-	query := `INSERT INTO formations (goalkeepers, attackers, defenders, updated_at, created_at)
-				VALUES (goalkeepers=?, attackers=?, defenders=?, updated_at=?, created_at=?);`
+	query := `INSERT INTO formations (goalkeeper, attackers, defenders, updated_at, created_at)
+				VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	stmt, err := r.db.PrepareContext(ctx, query)
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = stmt.ExecContext(ctx,
+	err = stmt.QueryRowContext(ctx,
 		formation.Goalkeeper,
 		formation.Attackers,
 		formation.Defenders,
 		formation.UpdatedAt,
 		formation.CreatedAt,
-		)
+		).Scan(&formation.ID)
 
 	if err != nil {
 		return nil, err
@@ -114,7 +113,7 @@ func (r FormationRepository) Insert(ctx context.Context, formation *entity.Forma
 }
 
 func (r FormationRepository) Update(ctx context.Context, formation *entity.Formation) (*entity.Formation, error) {
-	query := `UPDATE formations SET (goalkeepers=?, attackers=?, defenders=?,updated_at=?) WHERE id = ?;`
+	query := `UPDATE formations SET (goalkeeper, attackers, defenders, updated_at) = ($1, $2, $3, $4) WHERE id = $5`
 	stmt, err := r.db.PrepareContext(ctx, query)
 
 	if err != nil {
@@ -147,7 +146,7 @@ func (r FormationRepository) Update(ctx context.Context, formation *entity.Forma
 }
 
 func (r FormationRepository) Delete(ctx context.Context, id uint64) error {
-	query := `DELETE FROM formations WHERE id =?;`
+	query := `DELETE FROM formations WHERE id =$1`
 	stmt, err := r.db.PrepareContext(ctx, query)
 
 	if err != nil {
