@@ -29,15 +29,17 @@ func main() {
 	dbdriver := os.Getenv("DB_DRIVER")
 
 	repositories, err := persistence.NewRepositories(dbdriver, dbuser, dbpass, dbport, dbhost, dbname)
-	positionApplication := application.NewPositionApplication(repositories.Position, repositories.ScoutPosition, time.Second*5)
 
 	if err != nil {
 		panic(err)
 	}
 
+	positionApplication := application.NewPositionApplication(repositories.Position, repositories.ScoutPosition, time.Second*5)
+	scoutApplication := application.NewScoutApplication(repositories.Scout, repositories.ScoutPosition, time.Second*5)
+
 	position := interfaces.NewPositionHandler(positionApplication)
 	formations := interfaces.NewFormationHandler(repositories.Formation)
-	scouts := interfaces.NewScoutHandler(repositories.Scout)
+	scouts := interfaces.NewScoutHandler(scoutApplication)
 
 	router := mux.NewRouter()
 
